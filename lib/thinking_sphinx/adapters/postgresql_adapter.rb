@@ -112,6 +112,7 @@ module ThinkingSphinx
       if server_version >= 80311
         return
       elsif server_version > 80200
+        return if execute "SELECT 1 FROM pg_proc WHERE proname = 'array_accum' AND proisagg"
         execute <<-SQL
           CREATE AGGREGATE array_accum (anyelement)
           (
@@ -134,6 +135,8 @@ module ThinkingSphinx
     end
 
     def create_crc32_function
+      return if execute "SELECT 1 FROM pg_proc WHERE proname = 'crc32'"
+
       execute "CREATE LANGUAGE 'plpgsql';"
       function = <<-SQL
         CREATE OR REPLACE FUNCTION crc32(word text)
